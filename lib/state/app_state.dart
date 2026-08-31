@@ -8,6 +8,37 @@ class AppState extends ChangeNotifier {
   bool _isAuthenticated = false;
   String _mobileNumber = '';
   
+  bool _isRegistered = false;
+
+  // Onboarding profile details
+  String name = '';
+  String guardianName = '';
+  String farmerId = '';
+  String gender = '';
+  String dob = '';
+  String category = '';
+  String altMobileNumber = '';
+  String residentialAddress = '';
+  String state = '';
+  String district = '';
+  String mandal = '';
+  String village = '';
+  String market = '';
+  String farmerType = '';
+  String passbookNumber = '';
+  double totalLandOwned = 0.0;
+  double cottonLandOwned = 0.0;
+  
+  bool traditionalCrops = false;
+  double traditionalCropsAcres = 0.0;
+  bool hdps = false;
+  double hdpsAcres = 0.0;
+  bool desiCotton = false;
+  double desiCottonAcres = 0.0;
+  bool closerSpacing = false;
+  double closerSpacingAcres = 0.0;
+  bool hasUploadedDoc = false;
+  
   // List of bookings (includes completed history and current active bookings)
   final List<Booking> _bookings = [];
   
@@ -76,6 +107,7 @@ class AppState extends ChangeNotifier {
   // Getters
   bool get isTamil => _isTamil;
   bool get isAuthenticated => _isAuthenticated;
+  bool get isRegistered => _isRegistered;
   String get mobileNumber => _mobileNumber;
   List<Booking> get bookings => _bookings;
   List<AppNotification> get notifications => _notifications;
@@ -100,12 +132,80 @@ class AppState extends ChangeNotifier {
   void login(String mobile) {
     _mobileNumber = mobile;
     _isAuthenticated = true;
+    _isRegistered = true; // Auto-mark as registered if they quick-login for debugging
+    notifyListeners();
+  }
+
+  void submitRegistration({
+    required String mobileVal,
+    required String nameVal,
+    required String guardianVal,
+    required String farmerIdVal,
+    required String genderVal,
+    required String dobVal,
+    required String categoryVal,
+    required String altMobileVal,
+    required String addressVal,
+    required String stateVal,
+    required String districtVal,
+    required String mandalVal,
+    required String villageVal,
+    required String marketVal,
+    required String farmerTypeVal,
+    required String passbookVal,
+    required double totalLandVal,
+    required double cottonLandVal,
+    required bool tradCrops,
+    required double tradAcres,
+    required bool hdpsVal,
+    required double hdpsAcresVal,
+    required bool desiVal,
+    required double desiAcresVal,
+    required bool spacingVal,
+    required double spacingAcresVal,
+  }) {
+    _mobileNumber = mobileVal;
+    name = nameVal;
+    guardianName = guardianVal;
+    farmerId = farmerIdVal;
+    gender = genderVal;
+    dob = dobVal;
+    category = categoryVal;
+    altMobileNumber = altMobileVal;
+    residentialAddress = addressVal;
+    state = stateVal;
+    district = districtVal;
+    mandal = mandalVal;
+    village = villageVal;
+    market = marketVal;
+    farmerType = farmerTypeVal;
+    passbookNumber = passbookVal;
+    totalLandOwned = totalLandVal;
+    cottonLandOwned = cottonLandVal;
+    traditionalCrops = tradCrops;
+    traditionalCropsAcres = tradAcres;
+    hdps = hdpsVal;
+    hdpsAcres = hdpsAcresVal;
+    desiCotton = desiVal;
+    desiCottonAcres = desiAcresVal;
+    closerSpacing = spacingVal;
+    closerSpacingAcres = spacingAcresVal;
+    hasUploadedDoc = true;
+    
+    _isRegistered = true;
+    _isAuthenticated = true; // Automatically log in on registration submit
+    
+    addNotification(
+      'Farmer onboarding registration completed successfully for $name. Registration ID: $farmerId.',
+      'விவசாயி பதிவு $name க்காக வெற்றிகரமாக முடிந்தது. பதிவு எண்: $farmerId.',
+    );
     notifyListeners();
   }
 
   void logout() {
     _isAuthenticated = false;
     _mobileNumber = '';
+    _isRegistered = false;
     notifyListeners();
   }
 

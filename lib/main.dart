@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'state/app_state.dart';
-import 'screens/login_screen.dart';
-import 'screens/dashboard_screen.dart';
+import 'screens/portal_menu_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,21 +35,7 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
             fontFamily: 'Roboto',
           ),
-          home: _appState.isAuthenticated
-              ? DashboardScreen(
-                  appState: _appState,
-                  onLogout: () {
-                    setState(() {
-                      _appState.logout();
-                    });
-                  },
-                )
-              : LoginScreen(
-                  appState: _appState,
-                  onLoginSuccess: () {
-                    setState(() {});
-                  },
-                ),
+          home: PortalMenuScreen(appState: _appState),
         );
       },
     );

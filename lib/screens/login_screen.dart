@@ -433,121 +433,156 @@ class _LoginScreenState extends State<LoginScreen> {
 class AbhiyantLogoPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width * 0.4;
-    
-    // Draw gear outline (Green)
+    final center = Offset(size.width / 2, size.height / 2 + 10);
+    final radius = size.width * 0.38;
+
+    // 1. Draw Bottom Semi-circle Gear Arc
     final gearPaint = Paint()
       ..color = const Color(0xFF0F5A24)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5;
-    
-    canvas.drawCircle(center, radius, gearPaint);
+      ..strokeWidth = 6.5
+      ..strokeCap = StrokeCap.round;
 
-    // Draw Gear teeth
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    // Draw bottom half arc (from 0 to pi radians)
+    canvas.drawArc(rect, 0, 3.14159, false, gearPaint);
+
+    // 2. Draw Bottom Gear teeth on the arc
     final teethPaint = Paint()
       ..color = const Color(0xFF0F5A24)
       ..style = PaintingStyle.fill;
     
-    const teethCount = 12;
+    const teethCount = 7;
     for (int i = 0; i < teethCount; i++) {
-      final double angle = (2 * 3.14159 * i) / teethCount;
+      final double angle = (3.14159 * i) / (teethCount - 1);
       canvas.save();
       canvas.translate(center.dx, center.dy);
       canvas.rotate(angle);
-      final toothRect = Rect.fromLTWH(-6, -radius - 4, 12, 8);
+      final toothRect = Rect.fromLTWH(-6, radius - 2, 12, 8);
       canvas.drawRect(toothRect, teethPaint);
       canvas.restore();
     }
 
-    // Draw Sun inside (Top right quadrant) - Orange
-    final sunPaint = Paint()
-      ..color = Colors.orange.shade700
-      ..style = PaintingStyle.fill;
-    final sunCenter = Offset(center.dx + radius * 0.35, center.dy - radius * 0.35);
-    canvas.drawCircle(sunCenter, radius * 0.25, sunPaint);
-    
-    // Sun rays
-    final rayPaint = Paint()
-      ..color = Colors.orange.shade700
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-    for (int i = 0; i < 8; i++) {
-      final double angle = (2 * 3.14159 * i) / 8;
-      canvas.save();
-      canvas.translate(sunCenter.dx, sunCenter.dy);
-      canvas.rotate(angle);
-      canvas.drawLine(Offset(radius * 0.3, 0), Offset(radius * 0.42, 0), rayPaint);
-      canvas.restore();
-    }
-
-    // Draw Leaf (Green - left to center bottom)
-    final leafPaint = Paint()
-      ..color = Colors.green.shade600
-      ..style = PaintingStyle.fill;
-    
-    final Path leafPath = Path();
-    leafPath.moveTo(center.dx - radius * 0.2, center.dy + radius * 0.25);
-    leafPath.quadraticBezierTo(
-      center.dx + radius * 0.2, center.dy,
-      center.dx + radius * 0.3, center.dy - radius * 0.15
-    );
-    leafPath.quadraticBezierTo(
-      center.dx + radius * 0.4, center.dy + radius * 0.2,
-      center.dx - radius * 0.2, center.dy + radius * 0.25
-    );
-    canvas.drawPath(leafPath, leafPaint);
-
-    final Path leafPath2 = Path();
-    leafPath2.moveTo(center.dx - radius * 0.1, center.dy + radius * 0.4);
-    leafPath2.quadraticBezierTo(
-      center.dx + radius * 0.35, center.dy + radius * 0.25,
-      center.dx + radius * 0.48, center.dy + radius * 0.05
-    );
-    leafPath2.quadraticBezierTo(
-      center.dx + radius * 0.52, center.dy + radius * 0.35,
-      center.dx - radius * 0.1, center.dy + radius * 0.4
-    );
-    canvas.drawPath(leafPath2, leafPaint);
-
-    // Draw Wheat Stalk (Gold - left side curving up)
+    // 3. Draw Golden Wheat Stalk (Left Side rising and curving left)
     final wheatPaint = Paint()
-      ..color = Colors.amber.shade700
+      ..color = const Color(0xFFF9A825) // Golden amber
       ..style = PaintingStyle.fill;
 
-    // Wheat stem
     final stemPaint = Paint()
-      ..color = Colors.amber.shade700
-      ..strokeWidth = 3
+      ..color = const Color(0xFFF9A825)
+      ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
-    
+
     final Path stemPath = Path();
-    stemPath.moveTo(center.dx - radius * 0.5, center.dy + radius * 0.4);
+    final startPt = Offset(center.dx - radius * 0.75, center.dy);
+    stemPath.moveTo(startPt.dx, startPt.dy);
     stemPath.quadraticBezierTo(
-      center.dx - radius * 0.65, center.dy - radius * 0.2,
-      center.dx - radius * 0.35, center.dy - radius * 0.6
+      center.dx - radius * 1.0, center.dy - radius * 0.4,
+      center.dx - radius * 0.65, center.dy - radius * 1.0
     );
     canvas.drawPath(stemPath, stemPaint);
 
-    // Wheat grains along stem
-    for (int i = 0; i < 7; i++) {
-      final double t = 0.2 + (i * 0.11);
-      // Calculate quadratic Bezier point: B(t) = (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
-      final p0 = Offset(center.dx - radius * 0.5, center.dy + radius * 0.4);
-      final p1 = Offset(center.dx - radius * 0.65, center.dy - radius * 0.2);
-      final p2 = Offset(center.dx - radius * 0.35, center.dy - radius * 0.6);
-      
+    // Wheat Grains along the stem
+    for (int i = 0; i < 6; i++) {
+      final double t = 0.2 + (i * 0.15);
+      final p0 = startPt;
+      final p1 = Offset(center.dx - radius * 1.0, center.dy - radius * 0.4);
+      final p2 = Offset(center.dx - radius * 0.65, center.dy - radius * 1.0);
+
+      // Quadratic bezier formula
       final dx = (1-t)*(1-t)*p0.dx + 2*(1-t)*t*p1.dx + t*t*p2.dx;
       final dy = (1-t)*(1-t)*p0.dy + 2*(1-t)*t*p1.dy + t*t*p2.dy;
+
+      canvas.save();
+      canvas.translate(dx, dy);
+      canvas.rotate(-0.5 - (t * 0.3)); // tilt grains outwards
       
+      // Draw left grain
       canvas.drawOval(
-        Rect.fromCenter(center: Offset(dx - 5, dy), width: 7, height: 11),
+        Rect.fromCenter(center: const Offset(-4, 0), width: 5, height: 9),
         wheatPaint,
       );
+      // Draw right grain
       canvas.drawOval(
-        Rect.fromCenter(center: Offset(dx + 5, dy - 2), width: 7, height: 11),
+        Rect.fromCenter(center: const Offset(4, -2), width: 5, height: 9),
         wheatPaint,
       );
+      canvas.restore();
+    }
+
+    // 4. Draw Tall Center Green Blade (Leaf curving up & slightly left)
+    final centerLeafPaint = Paint()
+      ..color = const Color(0xFF0F5A24)
+      ..style = PaintingStyle.fill;
+
+    final Path centerLeaf = Path();
+    centerLeaf.moveTo(center.dx - radius * 0.1, center.dy + radius * 0.1);
+    centerLeaf.quadraticBezierTo(
+      center.dx - radius * 0.15, center.dy - radius * 0.4,
+      center.dx - radius * 0.28, center.dy - radius * 1.3 // tall apex
+    );
+    centerLeaf.quadraticBezierTo(
+      center.dx + radius * 0.05, center.dy - radius * 0.3,
+      center.dx, center.dy + radius * 0.1
+    );
+    centerLeaf.close();
+    canvas.drawPath(centerLeaf, centerLeafPaint);
+
+    // 5. Draw Right Green Leaves (Two leaves curving right/up)
+    final leafPaint = Paint()
+      ..color = const Color(0xFF2E7D32)
+      ..style = PaintingStyle.fill;
+
+    // Leaf 1 (upper-right)
+    final Path leaf1 = Path();
+    leaf1.moveTo(center.dx, center.dy + radius * 0.1);
+    leaf1.quadraticBezierTo(
+      center.dx + radius * 0.28, center.dy - radius * 0.1,
+      center.dx + radius * 0.42, center.dy - radius * 0.4 // apex
+    );
+    leaf1.quadraticBezierTo(
+      center.dx + radius * 0.3, center.dy + radius * 0.12,
+      center.dx, center.dy + radius * 0.1
+    );
+    leaf1.close();
+    canvas.drawPath(leaf1, leafPaint);
+
+    // Leaf 2 (lower-right)
+    final Path leaf2 = Path();
+    leaf2.moveTo(center.dx + radius * 0.1, center.dy + radius * 0.2);
+    leaf2.quadraticBezierTo(
+      center.dx + radius * 0.4, center.dy + radius * 0.1,
+      center.dx + radius * 0.65, center.dy - radius * 0.12 // apex
+    );
+    leaf2.quadraticBezierTo(
+      center.dx + radius * 0.45, center.dy + radius * 0.3,
+      center.dx + radius * 0.1, center.dy + radius * 0.2
+    );
+    leaf2.close();
+    canvas.drawPath(leaf2, leafPaint);
+
+    // 6. Draw Orange Sun (Top Right)
+    final sunPaint = Paint()
+      ..color = const Color(0xFFFF9100) // Deep orange
+      ..style = PaintingStyle.fill;
+
+    final sunCenter = Offset(center.dx + radius * 0.48, center.dy - radius * 0.7);
+    canvas.drawCircle(sunCenter, radius * 0.2, sunPaint);
+
+    // Sun rays
+    final rayPaint = Paint()
+      ..color = const Color(0xFFFF9100)
+      ..strokeWidth = 2.2
+      ..style = PaintingStyle.stroke;
+
+    for (int i = 0; i < 6; i++) {
+      // Rays on the upper/right side of the sun
+      final double angle = (3.14159 * i) / 7 - 0.3;
+      canvas.save();
+      canvas.translate(sunCenter.dx, sunCenter.dy);
+      canvas.rotate(angle);
+      canvas.drawLine(Offset(radius * 0.25, 0), Offset(radius * 0.36, 0), rayPaint);
+      canvas.restore();
     }
   }
 

@@ -68,6 +68,44 @@ class AdminSimulatorScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
+            // Farmer Profile status card
+            Card(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: ListTile(
+                leading: Icon(
+                  appState.isRegistered ? Icons.check_circle : Icons.cancel,
+                  color: appState.isRegistered ? Colors.green : Colors.red,
+                  size: 28,
+                ),
+                title: Text(
+                  isTamil ? 'விவசாயி பதிவு நிலை' : 'Farmer Registration Status',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  appState.isRegistered
+                      ? (isTamil ? 'பதிவு செய்யப்பட்டுள்ளது' : 'Registered & Profile Complete')
+                      : (isTamil ? 'பதிவு செய்யப்படவில்லை (பூட்டப்பட்டுள்ளது)' : 'Not Registered (Services Locked)'),
+                  style: TextStyle(
+                    color: appState.isRegistered ? Colors.green : Colors.red,
+                    fontSize: 12,
+                  ),
+                ),
+                trailing: Switch(
+                  value: appState.isRegistered,
+                  activeColor: const Color(0xFF0F5A24),
+                  onChanged: (val) {
+                    if (val) {
+                      appState.login('9876543210');
+                    } else {
+                      appState.logout();
+                    }
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
             // Active token details
             Text(
               isTamil ? 'செயலில் உள்ள டோக்கன் விவரங்கள்' : 'Active Token Details',
