@@ -14,22 +14,28 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  int _currentStep = 0;
-  CropType? _selectedCrop;
+  String? _selectedState;
+  String? _selectedDistrict;
+  String? _selectedMarket;
+  String? _selectedMill;
   final TextEditingController _quantityController = TextEditingController();
-  ProcurementCenter? _selectedCenter;
-  DateTime? _selectedDate;
-  String? _selectedTimeSlot;
+  DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   
   bool _isSuccess = false;
   String _generatedToken = '';
 
-  final List<String> _timeSlots = [
-    '09:00 AM - 11:00 AM',
-    '11:00 AM - 01:00 PM',
-    '02:00 PM - 04:00 PM',
-    '04:00 PM - 06:00 PM',
-  ];
+  final Color _darkGreen = const Color(0xFF1B5E20);
+  final Color _lightGreen = const Color(0xFFE8F5E9);
+  final Color _actionGreen = const Color(0xFF2E7D32);
+  final Color _bgColor = const Color(0xFFF9FBF9);
+  final Color _grayText = Colors.grey.shade600;
+  final Color _borderColor = Colors.grey.shade300;
+
+  // Mock data for dropdowns
+  final List<String> _states = ['Tamil Nadu', 'Karnataka', 'Andhra Pradesh', 'Kerala'];
+  final List<String> _districts = ['Chennai', 'Coimbatore', 'Madurai', 'Trichy'];
+  final List<String> _markets = ['Central Market', 'North Market', 'South Market'];
+  final List<String> _mills = ['Society A', 'Society B', 'Society C'];
 
   @override
   void dispose() {
@@ -37,18 +43,11 @@ class _BookingScreenState extends State<BookingScreen> {
     super.dispose();
   }
 
-  double get _estimatedPayout {
-    if (_selectedCrop == null) return 0.0;
-    final qty = double.tryParse(_quantityController.text) ?? 0.0;
-    final crop = Crop.getByType(_selectedCrop!);
-    return qty * crop.mspPrice;
-  }
-
   void _submitBooking() {
-    if (_selectedCrop == null ||
-        _selectedCenter == null ||
-        _selectedDate == null ||
-        _selectedTimeSlot == null ||
+    if (_selectedState == null ||
+        _selectedDistrict == null ||
+        _selectedMarket == null ||
+        _selectedMill == null ||
         _quantityController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -78,13 +77,7 @@ class _BookingScreenState extends State<BookingScreen> {
       return;
     }
 
-    // Combine date and time slot details
-    final bookingToken = widget.appState.createBooking(
-      _selectedCrop!,
-      qty,
-      _selectedCenter!,
-      _selectedDate!,
-    );
+    final bookingToken = "BKG-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
 
     setState(() {
       _generatedToken = bookingToken;
@@ -101,359 +94,552 @@ class _BookingScreenState extends State<BookingScreen> {
     }
 
     return Scaffold(
+      backgroundColor: _bgColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F5A24),
-        foregroundColor: Colors.white,
-        title: Text(AppTranslations.translate('booking_title', isTamil)),
-      ),
-      body: Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
-            primary: Color(0xFF0F5A24),
-          ),
+        backgroundColor: _bgColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: _darkGreen),
+          onPressed: () => Navigator.pop(context),
         ),
-        child: Stepper(
-          type: StepperType.vertical,
-          currentStep: _currentStep,
-          onStepContinue: () {
-            if (_currentStep == 0 && _selectedCrop == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(isTamil ? 'பயிரைத் தேர்ந்தெடுக்கவும்' : 'Please select a crop')),
-              );
-              return;
-            }
-            if (_currentStep == 1) {
-              final qty = double.tryParse(_quantityController.text) ?? 0.0;
-              if (qty <= 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(isTamil ? 'அளவு விவரத்தை உள்ளிடவும்' : 'Please enter quantity')),
-                );
-                return;
-              }
-            }
-            if (_currentStep == 2 && _selectedCenter == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(isTamil ? 'கொள்முதல் மையத்தைத் தேர்ந்தெடுக்கவும்' : 'Please select center')),
-              );
-              return;
-            }
-
-            if (_currentStep < 3) {
-              setState(() => _currentStep += 1);
-            } else {
-              _submitBooking();
-            }
-          },
-          onStepCancel: () {
-            if (_currentStep > 0) {
-              setState(() => _currentStep -= 1);
-            } else {
-              Navigator.pop(context);
-            }
-          },
-          controlsBuilder: (context, details) {
-            return Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: details.onStepContinue,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0F5A24),
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text(_currentStep == 3 ? (isTamil ? 'முன்பதிவு செய்' : 'Confirm Book') : (isTamil ? 'தொடரவும்' : 'Continue')),
-                  ),
-                  const SizedBox(width: 12),
-                  TextButton(
-                    onPressed: details.onStepCancel,
-                    child: Text(isTamil ? 'பின்செல்லவும்' : 'Back'),
-                  ),
-                ],
-              ),
-            );
-          },
-          steps: [
-            // Step 1: Crop Selection
-            Step(
-              title: Text(AppTranslations.translate('select_crop', isTamil)),
-              isActive: _currentStep >= 0,
-              state: _currentStep > 0 ? StepState.complete : StepState.editing,
-              content: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: Crop.availableCrops.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1.0,
-                ),
-                itemBuilder: (context, index) {
-                  final crop = Crop.availableCrops[index];
-                  final isSelected = _selectedCrop == crop.type;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() => _selectedCrop = crop.type);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isSelected ? crop.color.withOpacity(0.15) : Colors.white,
-                        border: Border.all(
-                          color: isSelected ? crop.color : Colors.grey.shade300,
-                          width: isSelected ? 2.5 : 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(crop.iconData, color: crop.color, size: 32),
-                          const SizedBox(height: 8),
-                          Text(
-                            AppTranslations.translate(crop.nameKey, isTamil),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: Colors.black87,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '₹${crop.mspPrice.toStringAsFixed(0)}',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+        title: Column(
+          children: [
+            Icon(Icons.eco, color: _actionGreen, size: 20),
+            Text(
+              isTamil ? 'முன்பதிவு செய்' : 'Book Your Slot',
+              style: TextStyle(
+                color: _darkGreen,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
               ),
             ),
-
-            // Step 2: Quantity
-            Step(
-              title: Text(AppTranslations.translate('enter_quantity', isTamil)),
-              isActive: _currentStep >= 1,
-              state: _currentStep > 1 ? StepState.complete : StepState.editing,
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _quantityController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      hintText: isTamil ? 'உதாரணம்: 25.5' : 'e.g. 25.5',
-                      suffixText: isTamil ? 'குவிண்டால்' : 'Quintals (100 Kg)',
-                      border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.scale),
-                    ),
-                    onChanged: (val) {
-                      setState(() {}); // Recalculate estimated payout
-                    },
-                  ),
-                  if (_selectedCrop != null && _quantityController.text.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Card(
-                      color: const Color(0xFFE8F5E9),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.currency_rupee, color: Color(0xFF2E7D32)),
-                            const SizedBox(width: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  isTamil ? 'மதிப்பிடப்பட்ட கொள்முதல் தொகை:' : 'Estimated Payout:',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-                                ),
-                                Text(
-                                  '₹${_estimatedPayout.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0F5A24),
-                                  ),
-                                ),
-                                Text(
-                                  isTamil
-                                      ? '*MSP விலைப்படி கணக்கிடப்பட்டது. தரம் அடிப்படையில் மாறுபடலாம்.'
-                                      : '*Calculated on MSP. Actual price depends on quality inspection.',
-                                  style: TextStyle(fontSize: 9, color: Colors.grey.shade600),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
+            const SizedBox(height: 2),
+            Text(
+              isTamil ? 'உங்கள் நேரத்தை ஒதுக்குங்கள்' : 'Reserve your slot, save time and effort.',
+              style: TextStyle(
+                color: _grayText,
+                fontSize: 12,
               ),
             ),
-
-            // Step 3: Center Selection with Congestion Indicators
-            Step(
-              title: Text(AppTranslations.translate('select_center', isTamil)),
-              isActive: _currentStep >= 2,
-              state: _currentStep > 2 ? StepState.complete : StepState.editing,
-              content: Column(
-                children: ProcurementCenter.availableCenters.map((center) {
-                  final isSelected = _selectedCenter?.id == center.id;
-                  
-                  // Congestion color styling
-                  Color congestionColor = Colors.green;
-                  String congestionTextKey = 'congestion_low';
-                  if (center.congestionLevel == 'medium') {
-                    congestionColor = Colors.orange;
-                    congestionTextKey = 'congestion_med';
-                  } else if (center.congestionLevel == 'high') {
-                    congestionColor = Colors.red;
-                    congestionTextKey = 'congestion_high';
-                  }
-
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    color: isSelected ? const Color(0xFFE8F5E9) : Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(
-                        color: isSelected ? const Color(0xFF0F5A24) : Colors.grey.shade200,
-                        width: isSelected ? 1.5 : 1.0,
-                      ),
-                    ),
-                    child: ListTile(
-                      onTap: () {
-                        setState(() => _selectedCenter = center);
-                      },
-                      title: Text(
-                        isTamil ? center.nameTamil : center.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(isTamil ? center.locationTamil : center.location, style: const TextStyle(fontSize: 12)),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: congestionColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                AppTranslations.translate(congestionTextKey, isTamil),
-                                style: TextStyle(
-                                  color: congestionColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                '(${isTamil ? 'காத்திருப்பு:' : 'Wait:'} ~${center.averageWaitTime} ${AppTranslations.translate('minutes', isTamil)})',
-                                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      trailing: isSelected
-                          ? const Icon(Icons.check_circle, color: Color(0xFF0F5A24))
-                          : null,
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-
-            // Step 4: DateTime Picker
-            Step(
-              title: Text(AppTranslations.translate('select_date_time', isTamil)),
-              isActive: _currentStep >= 3,
-              state: _currentStep == 3 ? StepState.editing : StepState.complete,
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Date selection button
-                  OutlinedButton.icon(
-                    onPressed: () async {
-                      final selected = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now().add(const Duration(days: 1)),
-                        firstDate: DateTime.now().add(const Duration(days: 1)),
-                        lastDate: DateTime.now().add(const Duration(days: 7)),
-                      );
-                      if (selected != null) {
-                        setState(() => _selectedDate = selected);
-                      }
-                    },
-                    icon: const Icon(Icons.calendar_today, color: Color(0xFF0F5A24)),
-                    label: Text(
-                      _selectedDate == null
-                          ? (isTamil ? 'தேதியைத் தேர்ந்தெடுக்கவும்' : 'Pick Delivery Date')
-                          : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                      style: const TextStyle(color: Color(0xFF0F5A24)),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-
-                  if (_selectedDate != null) ...[
-                    Text(
-                      isTamil ? 'கிடைக்கும் நேரங்கள்:' : 'Available Time Slots:',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _timeSlots.map((slot) {
-                        final isSelected = _selectedTimeSlot == slot;
-                        return ChoiceChip(
-                          label: Text(slot),
-                          selected: isSelected,
-                          selectedColor: const Color(0xFF0F5A24),
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black87,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() => _selectedTimeSlot = slot);
-                            }
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ],
+            const SizedBox(height: 4),
+            Container(
+              height: 3,
+              width: 40,
+              decoration: BoxDecoration(
+                color: _actionGreen,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
           ],
         ),
+        centerTitle: true,
+        toolbarHeight: 90,
+        actions: const [
+          SizedBox(width: 48), // Balance for centering
+        ],
+      ),
+      body: Stack(
+        children: [
+          // Top right decoration (placeholder for illustration)
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Opacity(
+              opacity: 0.8,
+              child: Container(
+                width: 150,
+                height: 100,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [_lightGreen, Colors.transparent],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                  borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(100)),
+                ),
+              ),
+            ),
+          ),
+          
+          SingleChildScrollView(
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 100),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildDropdownSection(
+                    icon: Icons.map,
+                    title: isTamil ? 'மாநிலம்' : 'State',
+                    subtitle: isTamil ? 'மாநிலத்தைத் தேர்ந்தெடுக்கவும்' : 'Select your state',
+                    value: _selectedState,
+                    items: _states,
+                    onChanged: (val) => setState(() => _selectedState = val),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  _buildDropdownSection(
+                    icon: Icons.location_city,
+                    title: isTamil ? 'மாவட்டம்' : 'District',
+                    subtitle: isTamil ? 'மாவட்டத்தைத் தேர்ந்தெடுக்கவும்' : 'Select your district',
+                    value: _selectedDistrict,
+                    items: _districts,
+                    onChanged: (val) => setState(() => _selectedDistrict = val),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  _buildDropdownSection(
+                    icon: Icons.store,
+                    title: isTamil ? 'சந்தை / மையம்' : 'Market / Procurement Centre',
+                    subtitle: isTamil ? 'மையத்தைத் தேர்ந்தெடுக்கவும்' : 'Select market or centre',
+                    value: _selectedMarket,
+                    items: _markets,
+                    onChanged: (val) => setState(() => _selectedMarket = val),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  _buildDropdownSection(
+                    icon: Icons.factory,
+                    title: isTamil ? 'ஆலை / சங்கம்' : 'Mill / Society',
+                    subtitle: isTamil ? 'ஆலையைத் தேர்ந்தெடுக்கவும்' : 'Select mill or society',
+                    value: _selectedMill,
+                    items: _mills,
+                    onChanged: (val) => setState(() => _selectedMill = val),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Expected Quantity Section (Updated)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _lightGreen,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.scale, color: _actionGreen),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isTamil ? 'எதிர்பார்க்கப்படும் அளவு (குவிண்டால்)' : 'Approx Weight (Quintals)',
+                              style: TextStyle(fontWeight: FontWeight.bold, color: _darkGreen, fontSize: 15),
+                            ),
+                            Text(
+                              isTamil ? 'தோராயமான எடையை உள்ளிடவும்' : 'Enter approximate weight in quintals',
+                              style: TextStyle(color: _grayText, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: _borderColor),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _quantityController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'e.g., 25.00',
+                              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                            ),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: Text(
+                            isTamil ? 'குவிண்டால்' : 'Quintals',
+                            style: TextStyle(color: _darkGreen, fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Date Picker Section (Updated)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _lightGreen,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.calendar_month, color: _actionGreen),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isTamil ? 'தேதியைத் தேர்ந்தெடுக்கவும்' : 'Select Date',
+                              style: TextStyle(fontWeight: FontWeight.bold, color: _darkGreen, fontSize: 16),
+                            ),
+                            Text(
+                              isTamil ? 'விரும்பிய தேதியை தேர்வு செய்யவும்' : 'Choose a convenient date for your slot',
+                              style: TextStyle(color: _grayText, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCalendarCard(),
+                  const SizedBox(height: 16),
+                  
+                  // Information Message (New)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _lightGreen,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.eco, color: _actionGreen, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isTamil ? 'மேலே உள்ள காலெண்டரில் தேதியை தேர்வு செய்யவும்' : 'Please select a date from the calendar above',
+                                style: TextStyle(fontWeight: FontWeight.bold, color: _darkGreen, fontSize: 12),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                isTamil ? 'கிடைக்கக்கூடிய தேதிகள் மட்டுமே காட்டப்படும்.' : 'Only available dates are shown.',
+                                style: TextStyle(color: _grayText, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Submit Button (Updated)
+                  ElevatedButton.icon(
+                    onPressed: _submitBooking,
+                    icon: const Icon(Icons.calendar_today, color: Colors.white, size: 20),
+                    label: Text(
+                      isTamil ? 'தேர்ந்தெடுக்கப்பட்டதை உறுதிசெய்' : 'Confirm Selected Slot',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _darkGreen,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          // Footer Illustration (Updated)
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 60,
+              decoration: BoxDecoration(
+                color: _bgColor,
+                border: Border(top: BorderSide(color: _borderColor, width: 0.5)),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    child: Icon(Icons.grass, color: _lightGreen, size: 40),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 16,
+                    child: Icon(Icons.agriculture, color: _actionGreen, size: 40),
+                  ),
+                  Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.eco, color: _actionGreen, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          isTamil ? 'வலுவான பண்ணைகள், சிறந்த எதிர்காலம்' : 'Stronger Farms, Better Future',
+                          style: TextStyle(
+                            color: _darkGreen,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(Icons.eco, color: _actionGreen, size: 16),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  // Beautiful Success Slip layout
-  Widget _buildSuccessScreen(bool isTamil) {
-    final crop = Crop.getByType(_selectedCrop!);
-    final center = _selectedCenter!;
+  Widget _buildDropdownSection({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: _lightGreen,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: _actionGreen),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontWeight: FontWeight.bold, color: _darkGreen, fontSize: 15),
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(color: _grayText, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          height: 40,
+          width: 120,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            border: Border.all(color: _borderColor),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: value,
+              hint: Text('Select', style: TextStyle(color: Colors.grey.shade400)),
+              icon: Icon(Icons.keyboard_arrow_down, color: _darkGreen),
+              onChanged: onChanged,
+              items: items.map((String item) {
+                return DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(
+                    item,
+                    style: const TextStyle(fontSize: 13),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCalendarCard() {
+    final daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     
+    final now = DateTime.now();
+    final firstDayOfMonth = DateTime(now.year, now.month, 1);
+    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+    final firstWeekday = firstDayOfMonth.weekday % 7; 
+    
+    final prevMonthDays = DateTime(now.year, now.month, 0).day;
+    
+    List<Widget> dayWidgets = [];
+    
+    // Previous month inactive days
+    for (int i = firstWeekday - 1; i >= 0; i--) {
+      dayWidgets.add(
+        Center(
+          child: Text(
+            (prevMonthDays - i).toString(),
+            style: TextStyle(color: Colors.grey.shade300, fontSize: 14),
+          ),
+        )
+      );
+    }
+    
+    // Current month days
+    for (int i = 1; i <= daysInMonth; i++) {
+      final date = DateTime(now.year, now.month, i);
+      final isSelected = _selectedDate.day == i && _selectedDate.month == now.month && _selectedDate.year == now.year;
+      
+      Color textColor = Colors.black87;
+      if (date.weekday == DateTime.sunday) {
+        textColor = Colors.red;
+      } else if (date.weekday == DateTime.saturday) {
+        textColor = _actionGreen;
+      }
+      
+      if (isSelected) textColor = Colors.white;
+
+      dayWidgets.add(
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedDate = date;
+            });
+          },
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isSelected ? _darkGreen : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              i.toString(),
+              style: TextStyle(
+                color: textColor,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: _bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _borderColor),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: _lightGreen,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.chevron_left, color: _darkGreen, size: 20),
+              ),
+              Text(
+                '${_getMonthName(now.month)} ${now.year}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: _darkGreen,
+                  fontSize: 16,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: _lightGreen,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.chevron_right, color: _darkGreen, size: 20),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: daysOfWeek.map((day) {
+              Color headerColor = Colors.grey.shade800;
+              if (day == 'Sun') headerColor = Colors.red;
+              if (day == 'Sat') headerColor = _actionGreen;
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    day,
+                    style: TextStyle(
+                      color: headerColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 12),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 7,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 8,
+            childAspectRatio: 1.0,
+            children: dayWidgets,
+          ),
+        ],
+      ),
+    );
+  }
+  
+  String _getMonthName(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
+  }
+
+  // Keep the success screen
+  Widget _buildSuccessScreen(bool isTamil) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F5A24),
+      backgroundColor: _darkGreen,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -493,8 +679,8 @@ class _BookingScreenState extends State<BookingScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                isTamil ? center.nameTamil : center.name,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0F5A24)),
+                                _selectedMarket ?? 'Market',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: _darkGreen),
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -530,11 +716,10 @@ class _BookingScreenState extends State<BookingScreen> {
 
                         // Grid values
                         _buildSlipRow(isTamil ? 'விவசாயி கைபேசி:' : 'Farmer Phone:', '+91 ${widget.appState.mobileNumber}'),
-                        _buildSlipRow(isTamil ? 'பயிர் வகை:' : 'Crop Type:', AppTranslations.translate(crop.nameKey, isTamil)),
+                        _buildSlipRow(isTamil ? 'மாநிலம்:' : 'State:', _selectedState ?? ''),
+                        _buildSlipRow(isTamil ? 'மாவட்டம்:' : 'District:', _selectedDistrict ?? ''),
                         _buildSlipRow(isTamil ? 'எதிர்பார்க்கப்படும் அளவு:' : 'Expected Quantity:', '${_quantityController.text} Quintals'),
-                        _buildSlipRow(isTamil ? 'தேதி:' : 'Scheduled Date:', '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'),
-                        _buildSlipRow(isTamil ? 'நேரம்:' : 'Time Window:', _selectedTimeSlot!),
-                        _buildSlipRow(isTamil ? 'மதிப்பிடப்பட்ட விலை:' : 'Est. Value:', '₹${_estimatedPayout.toStringAsFixed(2)}'),
+                        _buildSlipRow(isTamil ? 'தேதி:' : 'Scheduled Date:', '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}'),
                         
                         const Divider(height: 30, thickness: 1.2),
 
@@ -565,11 +750,11 @@ class _BookingScreenState extends State<BookingScreen> {
                   // Actions
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context); // Close Booking screen
+                      Navigator.pop(context); 
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF0F5A24),
+                      foregroundColor: _darkGreen,
                       minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                     ),
@@ -601,7 +786,6 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 }
 
-// Vector Painter to simulate a custom QR code for the digital slip
 class QRGeneratorPainter extends CustomPainter {
   final String token;
   const QRGeneratorPainter({required this.token});
@@ -612,32 +796,25 @@ class QRGeneratorPainter extends CustomPainter {
       ..color = Colors.black
       ..style = PaintingStyle.fill;
     
-    // Draw 3 corner alignment boxes
-    // Top-Left Box
     canvas.drawRect(const Rect.fromLTWH(0, 0, 25, 25), qrPaint);
     canvas.drawRect(const Rect.fromLTWH(5, 5, 15, 15), Paint()..color = Colors.white);
     canvas.drawRect(const Rect.fromLTWH(8, 8, 9, 9), qrPaint);
 
-    // Top-Right Box
     canvas.drawRect(Rect.fromLTWH(size.width - 25, 0, 25, 25), qrPaint);
     canvas.drawRect(Rect.fromLTWH(size.width - 20, 5, 15, 15), Paint()..color = Colors.white);
     canvas.drawRect(Rect.fromLTWH(size.width - 17, 8, 9, 9), qrPaint);
 
-    // Bottom-Left Box
     canvas.drawRect(Rect.fromLTWH(0, size.height - 25, 25, 25), qrPaint);
     canvas.drawRect(Rect.fromLTWH(5, size.height - 20, 15, 15), Paint()..color = Colors.white);
     canvas.drawRect(Rect.fromLTWH(8, size.height - 17, 9, 9), qrPaint);
 
-    // Draw some random barcode/QR pixels using simple loops based on token hash
     final int hash = token.hashCode;
     for (int x = 4; x < size.width - 4; x += 6) {
       for (int y = 4; y < size.height - 4; y += 6) {
-        // Skip corner finder boxes
         if (x < 28 && y < 28) continue;
         if (x > size.width - 28 && y < 28) continue;
         if (x < 28 && y > size.height - 28) continue;
 
-        // Psuedo random decision
         if ((x * y * hash) % 7 > 2.5) {
           canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 4, 4), qrPaint);
         }

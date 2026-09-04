@@ -110,7 +110,7 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
       _selectedMandal = 'Thanjavur Block';
       _selectedVillage = 'Melattur';
       _selectedMarket = 'Thanjavur APMC';
-      _selectedFarmerType = 'Small Farmer';
+      _selectedFarmerType = 'Small Farmer (1-2 Hectares)';
       _passbookController.text = 'PBK-992147312';
       
       _selectedMeasurementType = 'Acres';

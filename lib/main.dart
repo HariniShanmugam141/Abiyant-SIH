@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'state/app_state.dart';
-import 'screens/portal_menu_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
             fontFamily: 'Roboto',
           ),
-          home: PortalMenuScreen(appState: _appState),
+          home: SplashScreen(appState: _appState),
         );
       },
     );
