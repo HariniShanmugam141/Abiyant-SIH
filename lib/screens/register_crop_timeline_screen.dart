@@ -42,11 +42,10 @@ class _RegisterCropTimelineScreenState extends State<RegisterCropTimelineScreen>
                     _buildProgressIndicator(),
                     const SizedBox(height: 24),
                     const Text('Crop Journey', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: _darkGreen)),
-                    const SizedBox(height: 16),
-                    _buildTimelineItem(Icons.eco, 'Cultivation Started', '10 Jun 2026', 'Your crop has been registered and cultivation has started.', isPast: true),
-                    _buildTimelineItem(Icons.spa, 'Crop Growing', 'Current Stage', 'We will monitor your crop progress.', isPast: true),
-                    _buildTimelineItem(Icons.notifications_active, 'Harvest Approaching', 'In 25 days (approx.)', 'You will receive a reminder to confirm your harvest details.', isPast: false, iconColor: const Color(0xFFF57F17)),
-                    _buildTimelineItem(Icons.grass, 'Expected Harvest', '15 Sep 2026', 'Planned harvest date.', isPast: false, isLast: true, iconColor: const Color(0xFFF57C00)),
+                    _buildTimelineItem(Icons.eco, 'Cultivation Started', '10 Jun 2026', 'Your crop has been registered and cultivation has started.', iconColor: _darkGreen, bgColor: _lightGreen, lineColor: _darkGreen, subtitleBold: false),
+                    _buildTimelineItem(Icons.spa, 'Crop Growing', 'Current Stage', 'We will monitor your crop progress.', iconColor: _darkGreen, bgColor: _lightGreen, lineColor: const Color(0xFFC7B14A), subtitleBold: true),
+                    _buildTimelineItem(Icons.notifications, 'Harvest Approaching', 'In 25 days (approx.)', 'You will receive a reminder to confirm your harvest details.', iconColor: const Color(0xFFE65100), bgColor: const Color(0xFFFFF3E0), lineColor: const Color(0xFFC7B14A), subtitleBold: true),
+                    _buildTimelineItem(Icons.grass, 'Expected Harvest', '15 Sep 2026', 'Planned harvest date.', isLast: true, iconColor: const Color(0xFFE65100), bgColor: const Color(0xFFFFF3E0), subtitleBold: true),
                     const SizedBox(height: 16),
                     _buildSmartReminderCard(),
                     const SizedBox(height: 24),
@@ -128,7 +127,7 @@ class _RegisterCropTimelineScreenState extends State<RegisterCropTimelineScreen>
     return Expanded(child: Container(margin: const EdgeInsets.only(bottom: 24, left: 8, right: 8), height: 2, color: isActive ? _primaryGreen : const Color(0xFFE0E0E0)));
   }
 
-  Widget _buildTimelineItem(IconData icon, String title, String subtitle, String desc, {required bool isPast, bool isLast = false, Color? iconColor}) {
+  Widget _buildTimelineItem(IconData icon, String title, String subtitle, String desc, {bool isLast = false, required Color iconColor, required Color bgColor, Color? lineColor, required bool subtitleBold}) {
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -138,30 +137,29 @@ class _RegisterCropTimelineScreenState extends State<RegisterCropTimelineScreen>
             child: Column(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: isPast ? _lightGreen : Colors.white,
+                    color: bgColor,
                     shape: BoxShape.circle,
-                    border: Border.all(color: isPast ? _primaryGreen : const Color(0xFFE0E0E0)),
                   ),
-                  child: Icon(icon, color: iconColor ?? (isPast ? _primaryGreen : const Color(0xFF9E9E9E)), size: 18),
+                  child: Icon(icon, color: iconColor, size: 20),
                 ),
                 if (!isLast)
-                  Expanded(child: Container(width: 2, color: isPast ? _primaryGreen : const Color(0xFFE0E0E0))),
+                  Expanded(child: Container(width: 1.5, color: lineColor ?? const Color(0xFFE0E0E0))),
               ],
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
+              padding: const EdgeInsets.only(bottom: 24.0, top: 4.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _darkGreen)),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isPast ? _textPrimary : _textSecondary)),
+                  Text(subtitle, style: TextStyle(fontSize: 13, fontWeight: subtitleBold ? FontWeight.bold : FontWeight.w500, color: _textPrimary)),
                   const SizedBox(height: 4),
                   Text(desc, style: const TextStyle(fontSize: 12, color: _textSecondary, height: 1.3)),
                 ],
@@ -180,7 +178,11 @@ class _RegisterCropTimelineScreenState extends State<RegisterCropTimelineScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.smart_toy, color: _primaryGreen, size: 28),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(color: Color(0xFFC8E6C9), shape: BoxShape.circle),
+            child: const Icon(Icons.smart_toy, color: _darkGreen, size: 28),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -201,16 +203,16 @@ class _RegisterCropTimelineScreenState extends State<RegisterCropTimelineScreen>
     return InkWell(
       onTap: () => onChanged(!value),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 6.0),
         child: Row(
           children: [
             Container(
-              width: 20,
-              height: 20,
+              width: 22,
+              height: 22,
               decoration: BoxDecoration(
                 color: value ? _primaryGreen : Colors.white,
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: value ? _primaryGreen : _borderColor),
+                border: Border.all(color: value ? _primaryGreen : _borderColor, width: 1.5),
               ),
               child: value ? const Icon(Icons.check, color: Colors.white, size: 16) : null,
             ),
