@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
+import 'harvest_intimation_screen.dart';
 
 class CropDetailsScreen extends StatelessWidget {
   final AppState appState;
@@ -36,7 +37,7 @@ class CropDetailsScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                           _buildInformationCard(),
                           const SizedBox(height: 24),
-                          _buildActionButtons(),
+                          _buildActionButtons(context),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -258,7 +259,7 @@ class CropDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -282,7 +283,14 @@ class CropDetailsScreen extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HarvestIntimationScreen(appState: appState),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: _primaryGreen,

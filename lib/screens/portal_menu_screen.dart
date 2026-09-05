@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
+import 'my_lands_screen.dart';
 import 'my_crops_screen.dart';
-import 'onboarding_wizard.dart';
 import 'booking_screen.dart';
+import 'harvest_confirmation_screen.dart';
+import 'onboarding_wizard.dart';
 import 'queue_screen.dart';
 import 'tracking_screen.dart';
 import 'msp_info_screen.dart';
@@ -121,8 +123,7 @@ class PortalMenuScreen extends StatelessWidget {
           desc: 'Update harvest readiness, expected date and quantity',
           onTap: () => _needReg(
               ctx,
-              () => ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('Harvest – coming soon')))),
+              () => _go(ctx, HarvestConfirmationScreen(appState: appState))),
         ),
         _CardData(
           icon: Icons.calendar_today_rounded,
