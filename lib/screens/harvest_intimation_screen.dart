@@ -117,10 +117,16 @@ class _HarvestIntimationScreenState extends State<HarvestIntimationScreen> {
           ClipRRect(
             borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
             child: Image.network(
-              'https://images.unsplash.com/photo-1586528116311-ad8ed7c83f98?q=80&w=250&auto=format&fit=crop', // Warehouse/Procurement centre
+              'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=250&auto=format&fit=crop', // Working Warehouse image
               width: 120,
               height: 100,
               fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                width: 120,
+                height: 100,
+                color: _lightGreen,
+                child: const Icon(Icons.image, color: _primaryGreen),
+              ),
             ),
           ),
           Expanded(
