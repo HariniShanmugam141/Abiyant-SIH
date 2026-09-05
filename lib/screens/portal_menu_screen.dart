@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
+import 'my_crops_screen.dart';
 import 'onboarding_wizard.dart';
 import 'booking_screen.dart';
 import 'queue_screen.dart';
@@ -109,8 +110,7 @@ class PortalMenuScreen extends StatelessWidget {
           desc: 'Register crops, view crop details and cultivation info',
           onTap: () => _needReg(
               ctx,
-              () => ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('My Crops – coming soon')))),
+              () => _go(ctx, MyCropsScreen(appState: appState))),
         ),
         _CardData(
           icon: Icons.eco_rounded,
