@@ -554,6 +554,7 @@ class MyCropsScreen extends StatelessWidget {
           const Icon(Icons.chevron_right, color: _darkGreen, size: 28),
         ],
       ),
+      ),
     );
   }
 
