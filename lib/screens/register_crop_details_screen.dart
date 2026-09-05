@@ -42,19 +42,19 @@ class _RegisterCropDetailsScreenState extends State<RegisterCropDetailsScreen> {
                     const SizedBox(height: 24),
                     const Text('Cultivation & Harvest Details', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: _darkGreen)),
                     const SizedBox(height: 16),
-                    const Text('Cultivation Date', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _darkGreen)),
+                    const Text('Cultivation Date', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _darkGreen)),
                     const SizedBox(height: 8),
                     _buildTextField('10 Jun 2026', Icons.calendar_today),
                     const SizedBox(height: 16),
-                    const Text('Expected Harvest Date', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _darkGreen)),
+                    const Text('Expected Harvest Date', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _darkGreen)),
                     const SizedBox(height: 8),
                     _buildTextField('15 Sep 2026', Icons.event_available),
                     const SizedBox(height: 16),
-                    const Text('Initial Estimated Quantity', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _darkGreen)),
+                    const Text('Initial Estimated Quantity', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _darkGreen)),
                     const SizedBox(height: 8),
                     _buildTextFieldWithSuffix('2,500', 'kg', Icons.shopping_bag_outlined),
                     const SizedBox(height: 24),
-                    const Text('Add Crop Photos (Optional)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _darkGreen)),
+                    const Text('Add Crop Photos (Optional)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _darkGreen)),
                     const SizedBox(height: 12),
                     _buildPhotoGallery(),
                     const SizedBox(height: 24),
@@ -132,16 +132,14 @@ class _RegisterCropDetailsScreenState extends State<RegisterCropDetailsScreen> {
             ),
           ),
           child: Center(
-            child: isCompleted
-                ? const Icon(Icons.check, color: Colors.white, size: 16)
-                : Text(
-                    stepNumber,
-                    style: TextStyle(
-                      color: isActive ? Colors.white : _textSecondary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
+            child: Text(
+              stepNumber,
+              style: TextStyle(
+                color: isActive || isCompleted ? Colors.white : _textSecondary,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 8),
@@ -303,7 +301,7 @@ class _RegisterCropDetailsScreenState extends State<RegisterCropDetailsScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
-          Icon(Icons.lightbulb_outline, color: Color(0xFFF57C00), size: 24),
+          Icon(Icons.lightbulb, color: Color(0xFFFFB300), size: 24),
           SizedBox(width: 12),
           Expanded(
             child: Text(
