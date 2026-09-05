@@ -89,15 +89,36 @@ class RegisterCropSuccessScreen extends StatelessWidget {
   }
 
   Widget _buildHeroImage() {
-    return SizedBox(
-      height: 200,
+    return Container(
+      height: 220,
       width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(120)),
+      ),
       child: Stack(
-        alignment: Alignment.center,
         children: [
-          Image.network('https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=600&auto=format&fit=crop', width: double.infinity, fit: BoxFit.cover),
-          Container(color: Colors.black.withOpacity(0.2)),
-          const Icon(Icons.check_circle, color: Color(0xFF4CAF50), size: 80),
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(120)),
+            child: Image.network(
+              'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=600&auto=format&fit=crop', // Farmer image
+              width: double.infinity,
+              height: 220,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned(
+            right: 20,
+            top: 70,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Color(0xFF388E3C), // Solid Green
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.check, color: Colors.white, size: 40),
+            ),
+          ),
         ],
       ),
     );
@@ -106,19 +127,23 @@ class RegisterCropSuccessScreen extends StatelessWidget {
   Widget _buildSummaryCard() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: _lightGreen, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _borderColor),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text('Registration Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _darkGreen)),
           const SizedBox(height: 16),
-          _buildSummaryRow('Crop', 'Paddy (ADT 45)', Icons.grass),
+          _buildSummaryRow('Crop', 'Paddy (ADT 45)', Icons.eco),
           const SizedBox(height: 12),
-          _buildSummaryRow('Land', 'North Field (2.0 Acres)', Icons.location_on_outlined),
+          _buildSummaryRow('Land', 'North Field (2.0 Acres)', Icons.location_on),
           const SizedBox(height: 12),
-          _buildSummaryRow('Expected Harvest', '15 Sep 2026', Icons.event_available),
+          _buildSummaryRow('Expected Harvest', '15 Sep 2026', Icons.calendar_today),
           const SizedBox(height: 12),
-          _buildSummaryRow('Estimated Quantity', '2,500 kg', Icons.shopping_bag_outlined),
+          _buildSummaryRow('Estimated Quantity', '2,500 kg', Icons.inventory_2),
         ],
       ),
     );
@@ -127,25 +152,32 @@ class RegisterCropSuccessScreen extends StatelessWidget {
   Widget _buildSummaryRow(String label, String value, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: _primaryGreen, size: 20),
+        Icon(icon, color: _primaryGreen, size: 18),
         const SizedBox(width: 12),
         Expanded(child: Text(label, style: const TextStyle(fontSize: 13, color: _textSecondary))),
-        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _darkGreen)),
+        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _textPrimary)),
       ],
     );
   }
 
   Widget _buildWhatsNextSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("What's Next?", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _darkGreen)),
-        const SizedBox(height: 12),
-        _buildNextStep('1', 'Continue monitoring your crop'),
-        _buildNextStep('2', 'Receive automatic harvest reminders'),
-        _buildNextStep('3', 'Submit harvest intimation'),
-        _buildNextStep('4', 'Get a procurement slot'),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _lightGreen,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("What's Next?", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _darkGreen)),
+          const SizedBox(height: 12),
+          _buildNextStep('1', 'Continue monitoring your crop'),
+          _buildNextStep('2', 'Receive automatic harvest reminders'),
+          _buildNextStep('3', 'Submit harvest intimation'),
+          _buildNextStep('4', 'Get a procurement slot'),
+        ],
+      ),
     );
   }
 
@@ -157,11 +189,11 @@ class RegisterCropSuccessScreen extends StatelessWidget {
           Container(
             width: 24,
             height: 24,
-            decoration: const BoxDecoration(color: _primaryGreen, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: _darkGreen, shape: BoxShape.circle),
             child: Center(child: Text(stepNumber, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 13, color: _textPrimary))),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 13, color: _darkGreen, fontWeight: FontWeight.w500))),
         ],
       ),
     );
