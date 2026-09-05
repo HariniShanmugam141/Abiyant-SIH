@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../state/app_state.dart';
 import 'link_family_member_screen.dart';
 import 'portal_menu_screen.dart';
+import 'basic_phone_registration_screen.dart';
 
 class AccessTypeSelectionScreen extends StatelessWidget {
   final AppState appState;
@@ -119,6 +120,11 @@ class AccessTypeSelectionScreen extends StatelessWidget {
                     icon: Icons.phone_android,
                     title: 'I use a basic phone',
                     description: 'Get updates and services through\nSMS and voice calls',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => BasicPhoneRegistrationScreen(appState: appState),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   
