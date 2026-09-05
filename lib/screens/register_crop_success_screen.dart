@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
+import 'my_crops_screen.dart';
 
 class RegisterCropSuccessScreen extends StatelessWidget {
   final AppState appState;
@@ -171,8 +172,8 @@ class RegisterCropSuccessScreen extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          // Go back to the root My Crops screen
           Navigator.popUntil(context, (route) => route.isFirst);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => MyCropsScreen(appState: appState)));
         },
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),

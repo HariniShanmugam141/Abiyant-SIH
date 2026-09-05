@@ -127,26 +127,42 @@ class _RegisterCropConfirmScreenState extends State<RegisterCropConfirmScreen> {
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: _borderColor)),
       child: Column(
         children: [
-          _buildSummaryRow(
-            icon: Icons.grass,
-            label: 'Crop',
-            value: 'Paddy\nVariety: ADT 45',
-            imagePreview: 'https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=150&auto=format&fit=crop',
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network('https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=150&auto=format&fit=crop', width: 48, height: 48, fit: BoxFit.cover),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('Crop', style: TextStyle(fontSize: 12, color: _textSecondary)),
+                    SizedBox(height: 2),
+                    Text('Paddy', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: _darkGreen, height: 1.2)),
+                    SizedBox(height: 2),
+                    Text('Variety: ADT 45', style: TextStyle(fontSize: 12, color: _textSecondary)),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const Divider(height: 32, color: _borderColor),
+          const SizedBox(height: 20),
           _buildSummaryRow(icon: Icons.location_on_outlined, label: 'Land Parcel', value: 'North Field\nArea: 2.0 Acres'),
-          const Divider(height: 32, color: _borderColor),
+          const SizedBox(height: 16),
           _buildSummaryRow(icon: Icons.calendar_today, label: 'Cultivation Date', value: '10 Jun 2026'),
-          const Divider(height: 32, color: _borderColor),
+          const SizedBox(height: 16),
           _buildSummaryRow(icon: Icons.event_available, label: 'Expected Harvest Date', value: '15 Sep 2026'),
-          const Divider(height: 32, color: _borderColor),
+          const SizedBox(height: 16),
           _buildSummaryRow(icon: Icons.shopping_bag_outlined, label: 'Estimated Quantity', value: '2,500 kg', isHighlight: true),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryRow({required IconData icon, required String label, required String value, String? imagePreview, bool isHighlight = false}) {
+  Widget _buildSummaryRow({required IconData icon, required String label, required String value, bool isHighlight = false}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -175,11 +191,6 @@ class _RegisterCropConfirmScreenState extends State<RegisterCropConfirmScreen> {
             ],
           ),
         ),
-        if (imagePreview != null)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(imagePreview, width: 40, height: 40, fit: BoxFit.cover),
-          ),
       ],
     );
   }
@@ -212,13 +223,24 @@ class _RegisterCropConfirmScreenState extends State<RegisterCropConfirmScreen> {
     return InkWell(
       onTap: () => setState(() => _isConfirmed = !_isConfirmed),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(color: _isConfirmed ? _lightGreen : Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: _isConfirmed ? _primaryGreen : _borderColor)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        decoration: BoxDecoration(color: const Color(0xFFFFF8E1), borderRadius: BorderRadius.circular(16)),
         child: Row(
           children: [
-            Icon(_isConfirmed ? Icons.check_circle : Icons.radio_button_unchecked, color: _primaryGreen, size: 24),
+            const Icon(Icons.verified, color: _primaryGreen, size: 28),
             const SizedBox(width: 12),
             const Expanded(child: Text('I confirm that the above information is correct.', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _darkGreen))),
+            const SizedBox(width: 12),
+            Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                color: _isConfirmed ? _primaryGreen : Colors.white,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: _isConfirmed ? _primaryGreen : _borderColor, width: 1.5),
+              ),
+              child: _isConfirmed ? const Icon(Icons.check, color: Colors.white, size: 16) : null,
+            ),
           ],
         ),
       ),
