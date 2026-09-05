@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
+import 'harvest_status_screen.dart';
 
 class HarvestIntimationScreen extends StatefulWidget {
   final AppState appState;
@@ -316,7 +317,21 @@ class _HarvestIntimationScreenState extends State<HarvestIntimationScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Harvest Intimation Sent Successfully\nWe will notify you when procurement slots become available.'),
+              backgroundColor: Color(0xFF1B5E20),
+              duration: Duration(seconds: 4),
+            ),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HarvestStatusScreen(appState: widget.appState),
+            ),
+          );
+        },
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
           backgroundColor: _primaryGreen,

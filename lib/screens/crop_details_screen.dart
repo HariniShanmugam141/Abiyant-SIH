@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
 import 'harvest_intimation_screen.dart';
+import 'harvest_confirmation_screen.dart';
 
 class CropDetailsScreen extends StatelessWidget {
   final AppState appState;
@@ -264,7 +265,14 @@ class CropDetailsScreen extends StatelessWidget {
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HarvestConfirmationScreen(appState: appState),
+                ),
+              );
+            },
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               side: const BorderSide(color: _primaryGreen, width: 1.5),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
+import 'harvest_intimation_screen.dart';
 
 class HarvestConfirmationScreen extends StatefulWidget {
   final AppState appState;
@@ -322,7 +323,14 @@ class _HarvestConfirmationScreenState extends State<HarvestConfirmationScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HarvestIntimationScreen(appState: widget.appState),
+            ),
+          );
+        },
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
           backgroundColor: _primaryGreen,
@@ -332,7 +340,7 @@ class _HarvestConfirmationScreenState extends State<HarvestConfirmationScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
-            Text('Save Details', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text('Save & Continue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
             SizedBox(width: 8),
             Icon(Icons.arrow_forward, color: Colors.white, size: 20),
           ],
