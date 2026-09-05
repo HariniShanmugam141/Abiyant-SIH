@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
 import 'register_crop_screen.dart';
+import 'crop_details_screen.dart';
 
 class MyCropsScreen extends StatelessWidget {
   final AppState appState;
@@ -38,7 +39,7 @@ class MyCropsScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     _buildOverviewCard(),
                     const SizedBox(height: 24),
-                    _buildCropsList(),
+                    _buildCropsList(context),
                     const SizedBox(height: 16),
                     _buildRegisterButton(context),
                     const SizedBox(height: 24),
@@ -349,7 +350,7 @@ class MyCropsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCropsList() {
+  Widget _buildCropsList(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -377,6 +378,7 @@ class MyCropsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         _buildCropCard(
+          context: context,
           title: 'Paddy',
           status: 'Growing',
           harvestDate: '15 Sep 2025',
@@ -388,6 +390,7 @@ class MyCropsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         _buildCropCard(
+          context: context,
           title: 'Maize',
           status: 'Vegetative',
           harvestDate: '10 Oct 2025',
@@ -399,6 +402,7 @@ class MyCropsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         _buildCropCard(
+          context: context,
           title: 'Groundnut',
           status: 'Land Prepared',
           harvestDate: '25 Nov 2025',
@@ -413,6 +417,7 @@ class MyCropsScreen extends StatelessWidget {
   }
 
   Widget _buildCropCard({
+    required BuildContext context,
     required String title,
     required String status,
     required String harvestDate,
@@ -422,11 +427,20 @@ class MyCropsScreen extends StatelessWidget {
     required Color statusColor,
     required Color statusBg,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CropDetailsScreen(appState: appState),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
