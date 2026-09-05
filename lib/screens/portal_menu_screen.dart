@@ -9,7 +9,8 @@ import 'msp_info_screen.dart';
 import 'notifications_screen.dart';
 import 'admin_simulator.dart';
 import 'my_lands_screen.dart';
-
+import 'weather_alerts_screen.dart';
+import 'payment_details_screen.dart';
 class PortalMenuScreen extends StatelessWidget {
   final AppState appState;
   const PortalMenuScreen({super.key, required this.appState});
@@ -146,7 +147,7 @@ class PortalMenuScreen extends StatelessWidget {
           iconColor: Colors.transparent, // handled by custom painter
           title: 'Weather & Alerts',
           desc: 'Check weather, alerts and travel advisories',
-          onTap: () => _go(ctx, NotificationsScreen(appState: appState)),
+          onTap: () => _go(ctx, WeatherAlertsScreen(appState: appState)),
         ),
         _CardData(
           icon: Icons.local_shipping_rounded,
@@ -165,7 +166,7 @@ class PortalMenuScreen extends StatelessWidget {
           title: 'Payments',
           desc: 'Track payments, status and view receipts',
           onTap: () =>
-              _needReg(ctx, () => _go(ctx, TrackingScreen(appState: appState))),
+              _needReg(ctx, () => _go(ctx, PaymentDetailsScreen(appState: appState))),
         ),
       ];
 

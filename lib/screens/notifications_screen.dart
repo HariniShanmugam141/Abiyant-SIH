@@ -122,17 +122,69 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildEmptyView(bool isTamil) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.notifications_off_outlined, size: 70, color: Colors.grey.shade400),
-          const SizedBox(height: 15),
-          Text(
-            isTamil ? 'அறிவிப்புகள் ஏதும் இல்லை.' : 'No notifications yet.',
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
-          ),
-        ],
+    return ListView(
+      padding: const EdgeInsets.all(12),
+      children: [
+        _buildDemoCard(
+          Icons.notifications,
+          'OTP for login: 123456. Valid for 10 minutes.',
+          '3 mins ago',
+        ),
+        _buildDemoCard(
+          Icons.account_balance_wallet,
+          'Your payment of ₹61,837.50 for Wheat booking ABY-2026-7241 has been credited to your bank account via DBT.',
+          '23/8/2026',
+        ),
+        _buildDemoCard(
+          Icons.event_available,
+          'Quality check approved for Cotton booking ABY-2026-8910. Moisture level: 11.2%. Invoice is being generated.',
+          '1/9/2026',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDemoCard(IconData icon, String text, String time) {
+    return Card(
+      color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Colors.grey.shade200, width: 1.0),
+      ),
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: Colors.grey.shade600, size: 20),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    text,
+                    style: const TextStyle(fontSize: 13, color: Colors.black87, height: 1.4),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    time,
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
