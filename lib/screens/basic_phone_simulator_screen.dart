@@ -248,8 +248,9 @@ class _BasicPhoneSimulatorScreenState extends State<BasicPhoneSimulatorScreen> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text('Press 1 or Green Call Button to answer the call', style: TextStyle(color: Colors.grey, fontSize: 12)),
             const SizedBox(height: 16),
@@ -311,6 +312,7 @@ class _BasicPhoneSimulatorScreenState extends State<BasicPhoneSimulatorScreen> {
               ),
             ),
           ],
+        ),
         ),
       ),
     );
